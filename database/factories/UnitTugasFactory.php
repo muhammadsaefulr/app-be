@@ -25,8 +25,21 @@ class UnitTugasFactory extends Factory
             'nip' => \App\Models\Pegawai::factory(), 
             'gol' => $this->faker->randomElement(['I', 'II', 'III', 'IV']),
             'eselon' => $this->faker->randomElement(['Eselon I', 'Eselon II', 'Eselon III']),
-            'jabatan' => $this->faker->jobTitle,
-            'unit_kerja' => $this->faker->company,
+            'jabatan' => $this->faker->randomElement([
+                'Kepala Sekretariat Utama', 
+                'Penyusun laporan keuangan', 
+                'Surveyor Pemetaan Pertama', 
+                'Analis Data Survei dan Pemetaan', 
+                'Perancang Per-UU-an Utama', 
+                'Kepala Biro Perencanaan, Kepegawaian dan Keuangan'
+            ]),
+            
+            'unit_kerja' => $this->faker->randomElement([
+                'Sekretariat Utama', 
+                'Perencanaan', 
+                'Kepegawaian', 
+                'Keuangan'
+            ]),
         ];
     }
 }

@@ -2,86 +2,145 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\UnitTugasResource;
 use App\Models\UnitTugas;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Exception;
 
 class UnitTugasController extends Controller
 {
     public function index()
     {
-        $unitTugas = UnitTugas::all();
+        try {
+            $unitTugas = UnitTugas::all();
 
-        if ($unitTugas->isEmpty()) {
-            return response()->json(new UnitTugasResource([], 'Tidak ada unit tugas ditemukan.', null), 200);
+            if ($unitTugas->isEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Tidak ada unit tugas ditemukan.',
+                    'data' => []
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Daftar unit tugas berhasil diambil.',
+                'data' => $unitTugas
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat mengambil data unit tugas.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return UnitTugasResource::collection($unitTugas)->additional([
-            'status' => 'success',
-            'message' => 'Daftar unit tugas berhasil diambil.',
-        ]);
     }
 
-    // Menyimpan unit tugas baru
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nip' => 'required|string|unique:unit_tugas',
-            'gol' => 'required|string',
-            'eselon' => 'nullable|string',
-            'jabatan' => 'nullable|string',
-            'unit_kerja' => 'nullable|string',
-        ]);
+        try {
+            $validated = $request->validate([
+                'nip' => 'required|string|unique:unit_tugas',
+                'gol' => 'required|string',
+                'eselon' => 'nullable|string',
+                'jabatan' => 'nullable|string',
+                'unit_kerja' => 'nullable|string',
+            ]);
 
-        $unitTugas = UnitTugas::create($validated);
+            $unitTugas = UnitTugas::create($validated);
 
-        return new UnitTugasResource(true, 'Unit tugas berhasil ditambahkan.', $unitTugas);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Unit tugas berhasil ditambahkan.',
+                'data' => $unitTugas
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat menambahkan unit tugas.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function show($nip)
     {
-        $unitTugas = UnitTugas::where('nip', $nip)->first();
+        try {
+            $unitTugas = UnitTugas::where('nip', $nip)->firstOrFail();
 
-        if (!$unitTugas) {
-            return response()->json(['message' => 'Unit tugas tidak ditemukan'], 404);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Detail unit tugas berhasil diambil.',
+                'data' => $unitTugas
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unit tugas tidak ditemukan'
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat mengambil data unit tugas.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return new UnitTugasResource(true, 'Detail unit tugas berhasil diambil.', $unitTugas);
     }
 
     public function update(Request $request, $nip)
     {
-        $unitTugas = UnitTugas::where('nip', $nip)->first();
+        try {
+            $unitTugas = UnitTugas::where('nip', $nip)->firstOrFail();
 
-        if (!$unitTugas) {
-            return response()->json(['message' => 'Unit tugas tidak ditemukan'], 404);
+            $validated = $request->validate([
+                'gol' => 'sometimes|required|string',
+                'eselon' => 'sometimes|nullable|string',
+                'jabatan' => 'sometimes|nullable|string',
+                'unit_kerja' => 'sometimes|nullable|string',
+            ]);
+
+            $unitTugas->update($validated);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Unit tugas berhasil diperbarui.',
+                'data' => $unitTugas
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unit tugas tidak ditemukan'
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat memperbarui unit tugas.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $validated = $request->validate([
-            'gol' => 'sometimes|required|string',
-            'eselon' => 'sometimes|nullable|string',
-            'jabatan' => 'sometimes|nullable|string',
-            'unit_kerja' => 'sometimes|nullable|string',
-        ]);
-
-        $unitTugas->update($validated);
-
-        return new UnitTugasResource(true, 'Unit tugas berhasil diperbarui.', $unitTugas);
     }
 
     public function destroy($nip)
     {
-        $unitTugas = UnitTugas::where('nip', $nip)->first();
+        try {
+            $unitTugas = UnitTugas::where('nip', $nip)->firstOrFail();
+            $unitTugas->delete();
 
-        if (!$unitTugas) {
-            return response()->json(['message' => 'Unit tugas tidak ditemukan'], 404);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Unit tugas berhasil dihapus.'
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unit tugas tidak ditemukan'
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Terjadi kesalahan saat menghapus unit tugas.',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $unitTugas->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Unit tugas berhasil dihapus.',
-        ], 204);
     }
 }

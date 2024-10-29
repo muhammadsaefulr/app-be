@@ -12,7 +12,7 @@ class PegawaiController extends Controller
 {
     public function index()
     {
-        $pegawai = Pegawai::with('unitTugas', 'kontakPegawai')->get();
+        $pegawai = Pegawai::with('unitTugas', 'kontakPegawai','tempatTugasPegawai')->get();
 
         if ($pegawai->isEmpty()) {
             return response()->json(new PegawaiResource([], 'Tidak ada pegawai ditemukan.', null), 200);
@@ -32,10 +32,11 @@ class PegawaiController extends Controller
                 'alamat' => 'required|string',
                 'gender' => 'required|string|size:1',
                 'agama' => 'required|string',
-                'foto_pegawai' => 'nullable|image|mimes:jpeg,png,jpg|max:2048' // Validasi foto
+                'foto_pegawai' => 'nullable|image|mimes:jpeg,png,jpg|max:9048' // Validasi foto
             ]);
 
             if ($request->hasFile('foto_pegawai')) {
+                \Log::info('File foto pegawai diterima.');
                 $filePath = $request->file('foto_pegawai')->store('foto_pegawai', 'public');
                 $validated['foto_pegawai'] = $filePath;
             }
@@ -56,7 +57,7 @@ class PegawaiController extends Controller
         $pegawai = Pegawai::where('nip', $nip)->first();
 
         if (!$pegawai) {
-            return response()->json(['message' => 'Pegawai tidak ditemukan'], 404);
+            return response()->json(['message' => 'Pegawai tidak ditemukan'], 200);
         }
 
         try {
@@ -92,10 +93,13 @@ class PegawaiController extends Controller
 
     public function show($data)
     {
-        $pegawai = Pegawai::where('nip', $data)->first();
+        $pegawai = Pegawai::with(['unitTugas', 'kontakPegawai', 'tempatTugasPegawai'])
+        ->where('nip', $data)
+        ->firstOrFail();
+    
 
         if (!$pegawai) {
-            return response()->json(['message' => 'Pegawai tidak ditemukan'], 404);
+            return response()->json(['message' => 'Pegawai tidak ditemukan'], 200);
         }
 
         return response()->json($pegawai);
@@ -106,13 +110,13 @@ class PegawaiController extends Controller
         $pegawai = Pegawai::where('nip', $nip)->first();
 
         if (!$pegawai) {
-            return response()->json(['message' => 'Pegawai tidak ditemukan'], 404);
+            return response()->json(['message' => 'Pegawai tidak ditemukan'], 200);
         }
 
         $pegawai->delete();
         return response()->json([
             'success' => true,
             'message' => 'Pegawai berhasil dihapus.'
-        ], 204);
+        ], 200);
     }
 }

@@ -11,17 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kontak_pegawais', function (Blueprint $table) {
+        Schema::create('tempat_tugas_pegawais', function (Blueprint $table) {
             $table->id();
             $table->string('nip')->unique();
-            $table->string('no_hp');
-            $table->string('email')->nullable();
-            $table->string('npwp');
-
+            $table->string('tempat_tugas');
             $table->timestamps();
 
             $table->foreign('nip')->references('nip')->on('pegawai')->onDelete('cascade');
-
         });
     }
 
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kontak_pegawais');
+        Schema::dropIfExists('tempat_tugas_pegawais');
     }
 };

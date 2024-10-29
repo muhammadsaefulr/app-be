@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\AuthPegawai;
 use App\Models\Pegawai;
 use App\Models\KontakPegawai;
+use App\Models\TempatTugasPegawai;
 use App\Models\UnitTugas;
 use Illuminate\Database\Seeder;
 
@@ -15,7 +16,7 @@ class PegawaiSeeder extends Seeder
      */
     public function run(): void
     {
-        Pegawai::factory(50)->create()->each(function ($pegawai) {
+        Pegawai::factory(15)->create()->each(function ($pegawai) {
             AuthPegawai::factory()->create([
                 'nip' => $pegawai->nip, 
             ]);
@@ -25,6 +26,10 @@ class PegawaiSeeder extends Seeder
             ]);
 
             UnitTugas::factory()->create([
+                'nip' => $pegawai->nip,
+            ]);
+
+            TempatTugasPegawai::factory()->create([
                 'nip' => $pegawai->nip,
             ]);
         });

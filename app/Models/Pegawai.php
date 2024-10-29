@@ -41,4 +41,11 @@ class Pegawai extends Model
             $kontakPegawai->npwp = '';
         });
     }
+
+    public function tempatTugasPegawai()
+    {
+        return $this->hasOne(TempatTugasPegawai::class, 'nip', 'nip')->withDefault(function ($tempatTugasPegawai) {
+            $tempatTugasPegawai->tempat_tugas = '';
+        });
+    }
 }

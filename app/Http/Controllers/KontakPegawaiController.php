@@ -40,18 +40,20 @@ class KontakPegawaiController extends Controller
         $kontakPegawai = KontakPegawai::where('nip', $nip)->first();
 
         if (!$kontakPegawai) {
-            return response()->json(['message' => 'Kontak pegawai tidak ditemukan'], 404);
+            return response()->json(['message' => 'Kontak pegawai tidak ditemukan'], 200);
         }
 
-        return new KontakPegawaiResource(true, 'Detail kontak pegawai berhasil diambil.', $kontakPegawai);
-    }
+        return KontakPegawaiResource::collection($kontakPegawai)->additional([
+            'status' => 'success',
+            'message' => 'Berhasil Untuk Mengambil Kontak Pegawai !',
+        ]);    }
 
     public function update(Request $request, $nip)
     {
         $kontakPegawai = KontakPegawai::where('nip', $nip)->first();
 
         if (!$kontakPegawai) {
-            return response()->json(['message' => 'Kontak pegawai tidak ditemukan'], 404);
+            return response()->json(['message' => 'Kontak pegawai tidak ditemukan'], 200);
         }
 
         $validated = $request->validate([
@@ -70,7 +72,7 @@ class KontakPegawaiController extends Controller
         $kontakPegawai = KontakPegawai::where('nip', $nip)->first();
 
         if (!$kontakPegawai) {
-            return response()->json(['message' => 'Kontak pegawai tidak ditemukan'], 404);
+            return response()->json(['message' => 'Kontak pegawai tidak ditemukan'], 200);
         }
 
         $kontakPegawai->delete();
