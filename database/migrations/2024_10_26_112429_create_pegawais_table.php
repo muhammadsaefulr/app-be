@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('pegawai', function (Blueprint $table) {
             $table->id();
-            $table->string('nip')->primary();
+            $table->string('nip')->unique();
             $table->string('nama');
             $table->string('tempat_lahir');
             $table->date('tgl_lahir');
             $table->string('alamat');
             $table->char('gender', 1);
             $table->string('agama');
-            $table->string('foto_pegawai');
+            $table->string('foto_pegawai')->nullable();
             $table->timestamps();
         });
     }

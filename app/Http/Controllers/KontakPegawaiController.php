@@ -12,8 +12,8 @@ class KontakPegawaiController extends Controller
     {
         $kontakPegawai = KontakPegawai::all();
 
-        if($kontakPegawai->isEmpty()){
-            return response()->json(new KontakPegawaiResource([],"Data Kontak Tidak ditemukan.", null), 200);
+        if ($kontakPegawai->isEmpty()) {
+            return response()->json(new KontakPegawaiResource([], "Data Kontak Tidak ditemukan.", null), 200);
         }
 
         return KontakPegawaiResource::collection($kontakPegawai)->additional([
@@ -32,19 +32,27 @@ class KontakPegawaiController extends Controller
 
         $kontakPegawai = KontakPegawai::create($validated);
 
-        return new KontakPegawaiResource(true,'Kontak Pegawai Berhasil Di update', $kontakPegawai);
+        return new KontakPegawaiResource(true, 'Kontak Pegawai Berhasil Ditambahkan', $kontakPegawai);
     }
 
     public function show($nip)
     {
-        $kontakPegawai = KontakPegawai::where('nip', $nip)->firstOrFail();
+        $kontakPegawai = KontakPegawai::where('nip', $nip)->first();
+
+        if (!$kontakPegawai) {
+            return response()->json(['message' => 'Kontak pegawai tidak ditemukan'], 404);
+        }
 
         return new KontakPegawaiResource(true, 'Detail kontak pegawai berhasil diambil.', $kontakPegawai);
     }
 
     public function update(Request $request, $nip)
     {
-        $kontakPegawai = KontakPegawai::where('nip', $nip)->firstOrFail();
+        $kontakPegawai = KontakPegawai::where('nip', $nip)->first();
+
+        if (!$kontakPegawai) {
+            return response()->json(['message' => 'Kontak pegawai tidak ditemukan'], 404);
+        }
 
         $validated = $request->validate([
             'no_hp' => 'sometimes|required|string',
@@ -54,17 +62,22 @@ class KontakPegawaiController extends Controller
 
         $kontakPegawai->update($validated);
 
-        return new KontakPegawaiResource(true,'Kontak pegawau berhasil diupdate.', $kontakPegawai);
+        return new KontakPegawaiResource(true, 'Kontak pegawai berhasil diperbarui.', $kontakPegawai);
     }
 
     public function destroy($nip)
     {
-        $kontakPegawai = KontakPegawai::where('nip', $nip)->firstOrFail();
+        $kontakPegawai = KontakPegawai::where('nip', $nip)->first();
+
+        if (!$kontakPegawai) {
+            return response()->json(['message' => 'Kontak pegawai tidak ditemukan'], 404);
+        }
+
         $kontakPegawai->delete();
 
         return response()->json([
-            'success'=>true,
-            'message'=>'Kontak Berhasil Di reset.'
+            'success' => true,
+            'message' => 'Kontak Berhasil Dihapus.'
         ], 204);
     }
 }

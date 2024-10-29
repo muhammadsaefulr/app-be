@@ -35,19 +35,27 @@ class UnitTugasController extends Controller
 
         $unitTugas = UnitTugas::create($validated);
 
-        return new UnitTugasResource(true, 'Unit tugas berhasil update.', $unitTugas);
+        return new UnitTugasResource(true, 'Unit tugas berhasil ditambahkan.', $unitTugas);
     }
 
     public function show($nip)
     {
-        $unitTugas = UnitTugas::where('nip', $nip)->firstOrFail();
+        $unitTugas = UnitTugas::where('nip', $nip)->first();
+
+        if (!$unitTugas) {
+            return response()->json(['message' => 'Unit tugas tidak ditemukan'], 404);
+        }
 
         return new UnitTugasResource(true, 'Detail unit tugas berhasil diambil.', $unitTugas);
     }
 
     public function update(Request $request, $nip)
     {
-        $unitTugas = UnitTugas::where('nip', $nip)->firstOrFail();
+        $unitTugas = UnitTugas::where('nip', $nip)->first();
+
+        if (!$unitTugas) {
+            return response()->json(['message' => 'Unit tugas tidak ditemukan'], 404);
+        }
 
         $validated = $request->validate([
             'gol' => 'sometimes|required|string',
@@ -63,7 +71,12 @@ class UnitTugasController extends Controller
 
     public function destroy($nip)
     {
-        $unitTugas = UnitTugas::where('nip', $nip)->firstOrFail();
+        $unitTugas = UnitTugas::where('nip', $nip)->first();
+
+        if (!$unitTugas) {
+            return response()->json(['message' => 'Unit tugas tidak ditemukan'], 404);
+        }
+
         $unitTugas->delete();
 
         return response()->json([

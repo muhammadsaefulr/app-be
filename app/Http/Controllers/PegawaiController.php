@@ -18,7 +18,7 @@ class PegawaiController extends Controller
             return response()->json(new PegawaiResource([], 'Tidak ada pegawai ditemukan.', null), 200);
         }
 
-        return new PegawaiResource('success', 'Daftar unit tugas berhasil diambil.', $pegawai);
+        return new PegawaiResource('success', 'Daftar pegawai berhasil diambil.', $pegawai);
     }
 
     public function store(Request $request)
@@ -53,7 +53,11 @@ class PegawaiController extends Controller
 
     public function update(Request $request, $nip)
     {
-        $pegawai = Pegawai::findOrFail($nip);
+        $pegawai = Pegawai::where('nip', $nip)->first();
+
+        if (!$pegawai) {
+            return response()->json(['message' => 'Pegawai tidak ditemukan'], 404);
+        }
 
         try {
             $validated = $request->validate([
@@ -86,16 +90,25 @@ class PegawaiController extends Controller
         }
     }
 
-
-    public function show($nip)
+    public function show($data)
     {
-        $pegawai = Pegawai::findOrFail($nip);
-        return new PegawaiResource(true, 'Detail pegawai berhasil diambil.', $pegawai);
+        $pegawai = Pegawai::where('nip', $data)->first();
+
+        if (!$pegawai) {
+            return response()->json(['message' => 'Pegawai tidak ditemukan'], 404);
+        }
+
+        return response()->json($pegawai);
     }
 
     public function destroy($nip)
     {
-        $pegawai = Pegawai::findOrFail($nip);
+        $pegawai = Pegawai::where('nip', $nip)->first();
+
+        if (!$pegawai) {
+            return response()->json(['message' => 'Pegawai tidak ditemukan'], 404);
+        }
+
         $pegawai->delete();
         return response()->json([
             'success' => true,
